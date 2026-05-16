@@ -1,55 +1,37 @@
-# Virtual environments
-venv/
-env/
-ENV/
-.venv
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
+.venv/
+env/
+venv/
+ENV/
+
+# Build and Dist
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
+*.spec
 
 # Logs
-log.txt
 *.log
+log.txt
 
-# OS
-Thumbs.db
-.DS_Store
-
-# Project specific
+# Environment / Secret
+.env
 config.json
-!config.json.example
+
+# Temporary / Test files
+tmp_*.html
+response_output.html
+test_*.py
+playwright_fail.png
+extract_entries.py
+check_missing_fields.py
+check_unknown.py
+log_analyzer.py
+parse_test2.py
+test2.html
+
+# IDEs
+.vscode/
+.idea/

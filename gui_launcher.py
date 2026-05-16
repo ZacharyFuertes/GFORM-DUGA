@@ -8,6 +8,11 @@ import logging
 import os
 import sys
 import multiprocessing
+
+# ── Playwright EXE Fix ────────────────────────────────────────────────────────
+# Force Playwright to look for browsers in the standard system path 
+# instead of inside the temporary PyInstaller folder (_MEIPASS).
+os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
 from datetime import datetime
 
 # ── Import the bot logic directly ──────────────────────────────────────────────

@@ -1,0 +1,38 @@
+{
+  "form_url": "https://docs.google.com/forms/d/YOUR_FORM_ID_HERE/viewform",
+  "fields": [
+    {
+      "entry_id": "entry.1234567890",
+      "type": "choice",
+      "options": ["Option A", "Option B", "Option C"]
+    },
+    {
+      "entry_id": "entry.1234567891",
+      "type": "name"
+    },
+    {
+      "entry_id": "entry.1234567892",
+      "type": "email"
+    },
+    {
+      "entry_id": "entry.1234567893",
+      "type": "phone"
+    },
+    {
+      "entry_id": "entry.1234567894",
+      "type": "text"
+    },
+    {
+      "entry_id": "entry.1234567895",
+      "type": "paragraph"
+    },
+    {
+      "entry_id": "entry.1234567896",
+      "type": "number"
+    },
+    {
+      "entry_id": "entry.1234567897",
+      "type": "date"
+    }
+  ]
+}
