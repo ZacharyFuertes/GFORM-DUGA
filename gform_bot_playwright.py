@@ -30,122 +30,124 @@ FEMALE_NAMES = [
     "Francesca Rivera", "Mariel Santos", "Bianca Mendoza"
 ]
 
+DOMAINS = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com"]
+
 def build_name_pool():
     """Create a shuffled pool of (name, gender) tuples. No repeats until pool is exhausted."""
     pool = [(n, "Male") for n in MALE_NAMES] + [(n, "Female") for n in FEMALE_NAMES]
     random.shuffle(pool)
     return pool
 
-async def fill_radiogroups(page, gender=None):
-    """Fill all radiogroups. If gender is provided, use it for the 2-option (Male/Female) group."""
+def generate_email(name):
+    """Generate a realistic email based on a name."""
+    clean_name = name.lower().replace(" ", ".")
+    domain = random.choice(DOMAINS)
+    suffix = random.choice(["", str(random.randint(1, 99))])
+    return f"{clean_name}{suffix}@{domain}"
+
+async def smart_fill(page, name_pool):
+    """Dynamically find and fill all visible fields on the current page."""
+    data_used = {"name": None, "email": None}
+    
+    # Find all radio groups (Linear Scale / Multiple Choice / Grid)
     radiogroups = await page.locator('div[role="radiogroup"]').all()
+    
     for rg in radiogroups:
         radios = await rg.locator('div[role="radio"]').all()
-        if not radios:
-            continue
-
-        if len(radios) == 5:
-            # Rating scale: columns go 5 -> 1 left to right
-            # index 0 = 5, index 1 = 4, index 2 = 3
-            idx = random.choice([0, 1, 2])
+        if not radios: continue
+        
+        if len(radios) == 5: # Rating 1-5
+            idx = random.choice([0, 1, 2]) # 5, 4, 3
             await radios[idx].click()
-            await page.wait_for_timeout(random.randint(100, 300))
-        elif len(radios) == 2 and gender is not None:
-            # Gender question: pick based on the name's gender
-            # options are Male (index 0) and Female (index 1)
-            idx = 0 if gender == "Male" else 1
+        elif len(radios) == 2: # Potential Gender or Binary
+            idx = random.randint(0, 1)
             await radios[idx].click()
-            await page.wait_for_timeout(random.randint(100, 300))
         else:
-            choice = random.choice(radios)
-            await choice.click()
+            await random.choice(radios).click()
+        await page.wait_for_timeout(random.randint(100, 300))
+
+    # Find all text inputs
+    text_inputs = await page.locator('input[type="text"], textarea').all()
+    for ti in text_inputs:
+        if await ti.is_visible():
+            name_attr = (await ti.get_attribute("name") or "").lower()
+            aria_label = (await ti.get_attribute("aria-label") or "").lower()
+            
+            # Email detection
+            if "email" in name_attr or "email" in aria_label:
+                if not data_used["email"]:
+                    fake_name = random.choice(MALE_NAMES + FEMALE_NAMES)
+                    email = generate_email(fake_name)
+                    data_used["email"] = email
+                    await ti.fill(email)
+                    logging.info(f"  Filled email: {email}")
+            # Name detection or generic
+            elif name_pool and random.random() < 0.6:
+                if not data_used["name"]:
+                    chosen_name, g = name_pool.pop()
+                    data_used["name"] = chosen_name
+                    await ti.fill(chosen_name)
+                    logging.info(f"  Filled text field with: {chosen_name}")
+                else:
+                    await ti.fill(f"Tester {random.randint(10, 99)}")
+            else:
+                await ti.fill(f"Test Response {random.randint(100, 999)}")
             await page.wait_for_timeout(random.randint(100, 300))
+    return data_used
 
-async def fill_page1(page, name_pool):
-    """Fill page 1: optionally type a name and select gender."""
-    use_name = random.random() < 0.5  # 50% chance of filling name
-    gender = None
-
-    if use_name and name_pool:
-        chosen_name, gender = name_pool.pop()
-        # Google Forms renders a visible input[type="text"] for short answer fields
-        # The hidden input[name="entry.XXX"] just holds the value — we fill the visible one
-        name_input = page.locator('input[type="text"]').first
-        count = await name_input.count()
-        if count > 0:
-            await name_input.click()
-            await name_input.fill(chosen_name)
-            await page.wait_for_timeout(random.randint(100, 200))
-            logging.info(f"  Name: {chosen_name} ({gender})")
-    
-    await fill_radiogroups(page, gender=gender)
-
-async def submit_form(context, i, count, name_pool):
+async def submit_form(context, i, count, name_pool, url):
     page = await context.new_page()
+    submission_data = {"name": None, "email": None}
     try:
-        await page.goto(FORM_URL)
+        await page.goto(url)
         await page.wait_for_load_state("networkidle")
 
-        # Page 1: Basic Info (name + gender)
-        await fill_page1(page, name_pool)
-
-        # Click Next
-        btns = await page.locator('div[role="button"]').all()
-        for btn in btns:
-            text = await btn.inner_text()
-            if "Susunod" in text or "Next" in text:
-                await btn.click()
+        max_pages = 10 
+        for _ in range(max_pages):
+            step_data = await smart_fill(page, name_pool)
+            if step_data["name"]: submission_data["name"] = step_data["name"]
+            if step_data["email"]: submission_data["email"] = step_data["email"]
+            
+            btns = await page.locator('div[role="button"]').all()
+            next_btn = None
+            submit_btn = None
+            
+            for btn in btns:
+                text = (await btn.inner_text()).lower()
+                if "next" in text or "susunod" in text:
+                    next_btn = btn
+                if "submit" in text or "isumite" in text:
+                    submit_btn = btn
+            
+            if submit_btn:
+                await submit_btn.click()
+                await page.wait_for_timeout(2000)
                 break
-                
-        await page.wait_for_timeout(1000)
-        
-        # Page 2: Part 1
-        await fill_radiogroups(page)
-
-        # Click Next
-        btns = await page.locator('div[role="button"]').all()
-        for btn in btns:
-            text = await btn.inner_text()
-            if "Susunod" in text or "Next" in text:
-                await btn.click()
+            elif next_btn:
+                await next_btn.click()
+                await page.wait_for_timeout(1000)
+            else:
                 break
 
-        await page.wait_for_timeout(1000)
-
-        # Page 3: Part 2
-        await fill_radiogroups(page)
-        
-        # Click Submit
-        btns = await page.locator('div[role="button"]').all()
-        for btn in btns:
-            text = await btn.inner_text()
-            if "Isumite" in text or "Submit" in text:
-                await btn.click()
-                break
-                
-        await page.wait_for_timeout(2000)
-        # Check success
         content = await page.content()
-        if "tugon" in content.lower() or "recorded" in content.lower():
+        if "recorded" in content.lower() or "tugon" in content.lower():
             logging.info(f"[{i}/{count}] OK")
-            return True
-        else:
-            await page.screenshot(path=f"playwright_fail_{i}.png", full_page=True)
-            logging.warning(f"[{i}/{count}] Failed. Screenshot saved.")
-            return False
+            return True, submission_data
+        return False, submission_data
             
     except Exception as e:
         logging.error(f"[{i}/{count}] Error: {e}")
-        return False
+        return False, submission_data
     finally:
         await page.close()
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--count", type=int, default=18)
+    parser.add_argument("--count", type=int, default=1)
+    parser.add_argument("--url", type=str, required=True)
     args = parser.parse_args()
     
-    logging.info(f"Starting {args.count} Playwright iterations...")
+    logging.info(f"Starting {args.count} iterations on {args.url}...")
     
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -154,10 +156,9 @@ async def main():
         name_pool = build_name_pool()
         success = 0
         for i in range(1, args.count + 1):
-            # Replenish pool if exhausted (only happens if count > 50 names)
             if not name_pool:
                 name_pool = build_name_pool()
-            res = await submit_form(context, i, args.count, name_pool)
+            res = await submit_form(context, i, args.count, name_pool, args.url)
             if res:
                 success += 1
             await asyncio.sleep(random.uniform(1.0, 3.0))

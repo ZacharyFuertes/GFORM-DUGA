@@ -36,7 +36,8 @@ GFORM DUGA is an automated Google Form submission tool designed for rapid, intel
 3. Install dependencies:
    pip install -r requirements.txt
 4. Run the launcher:
-   python gui_launcher.py
+   run.bat gui
+   (Alternative: python gui_launcher.py)
 5. Use the GUI to configure and start the submission process.
 
 ## Notes

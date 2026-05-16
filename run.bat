@@ -3,20 +3,20 @@ REM Google Form Bot - Windows batch commands
 
 if "%1"=="install" (
     echo Installing dependencies...
-    python -m pip install -r requirements.txt
+    py -m pip install -r requirements.txt
     echo Done!
     goto end
 )
 
 if "%1"=="setup" (
     echo Running configuration setup...
-    python setup_config.py
+    py setup_config.py
     goto end
 )
 
 if "%1"=="test" (
     echo Running single submission test...
-    python gform_bot.py --count 1
+    py gform_bot.py --count 1
     goto end
 )
 
@@ -27,19 +27,25 @@ if "%1"=="run" (
         goto end
     )
     echo Running %2 submissions...
-    python gform_bot.py --count %2
+    py gform_bot.py --count %2
     goto end
 )
 
 if "%1"=="report" (
     echo Generating report...
-    python log_analyzer.py report
+    py log_analyzer.py report
+    goto end
+)
+
+if "%1"=="gui" (
+    echo Launching GFORM DUGA GUI...
+    py gui_launcher.py
     goto end
 )
 
 if "%1"=="log" (
     echo Showing last 20 log lines...
-    python log_analyzer.py tail 20
+    py log_analyzer.py tail 20
     goto end
 )
 
@@ -62,6 +68,7 @@ echo Commands:
 echo   install     Install Python dependencies
 echo   setup       Interactive configuration setup
 echo   test        Run single submission test
+echo   gui         Launch the browser-based GUI
 echo   run [N]     Run N submissions
 echo   report      Show submission report
 echo   log         Show last 20 log lines
