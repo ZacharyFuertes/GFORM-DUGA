@@ -45,26 +45,33 @@ def generate_email(name):
     suffix = random.choice(["", str(random.randint(1, 99))])
     return f"{clean_name}{suffix}@{domain}"
 
-async def smart_fill(page, name_pool):
+async def smart_fill(page, assigned_name, name_written):
     """Dynamically find and fill all visible fields on the current page."""
-    data_used = {"name": None, "email": None}
+    data_used = {"name_written": name_written, "email": None, "answers": []}
     
     # Find all radio groups (Linear Scale / Multiple Choice / Grid)
     radiogroups = await page.locator('div[role="radiogroup"]').all()
     
-    for rg in radiogroups:
+    for gi, rg in enumerate(radiogroups, 1):
         radios = await rg.locator('div[role="radio"]').all()
         if not radios: continue
         
         if len(radios) == 5: # Rating 1-5
             idx = random.choice([0, 1, 2]) # 5, 4, 3
-            await radios[idx].click()
         elif len(radios) == 2: # Potential Gender or Binary
             idx = random.randint(0, 1)
-            await radios[idx].click()
         else:
-            await random.choice(radios).click()
+            idx = random.randrange(len(radios))
+
+        question = (await rg.get_attribute("aria-label") or "").strip() or f"question {gi}"
+        option = (await radios[idx].get_attribute("aria-label") or "").strip()
+        choice = option or f"option {idx + 1} of {len(radios)}"
+        data_used["answers"].append((question, choice))
+        logging.info("  Q%-3d %s -> %s", gi, question, choice)
+
+        await radios[idx].click()
         await page.wait_for_timeout(random.randint(100, 300))
+
 
     # Find all text inputs
     text_inputs = await page.locator('input[type="text"], textarea').all()
@@ -82,14 +89,10 @@ async def smart_fill(page, name_pool):
                     await ti.fill(email)
                     logging.info(f"  Filled email: {email}")
             # Name detection or generic
-            elif name_pool and random.random() < 0.6:
-                if not data_used["name"]:
-                    chosen_name, g = name_pool.pop()
-                    data_used["name"] = chosen_name
-                    await ti.fill(chosen_name)
-                    logging.info(f"  Filled text field with: {chosen_name}")
-                else:
-                    await ti.fill(f"Tester {random.randint(10, 99)}")
+            elif not data_used["name_written"]:
+                await ti.fill(assigned_name)
+                data_used["name_written"] = True
+                logging.info(f"  Filled name field with: {assigned_name}")
             else:
                 await ti.fill(f"Test Response {random.randint(100, 999)}")
             await page.wait_for_timeout(random.randint(100, 300))
@@ -97,16 +100,20 @@ async def smart_fill(page, name_pool):
 
 async def submit_form(context, i, count, name_pool, url):
     page = await context.new_page()
-    submission_data = {"name": None, "email": None}
+    submission_data = {"name": None, "email": None, "reason": None, "answers": []}
+    assigned_name, _ = name_pool.pop() if name_pool else (None, None)
     try:
         await page.goto(url)
         await page.wait_for_load_state("networkidle")
 
         max_pages = 10 
         for _ in range(max_pages):
-            step_data = await smart_fill(page, name_pool)
-            if step_data["name"]: submission_data["name"] = step_data["name"]
-            if step_data["email"]: submission_data["email"] = step_data["email"]
+            step_data = await smart_fill(page, assigned_name, submission_data["name"] is not None)
+            if step_data["name_written"]:
+                submission_data["name"] = assigned_name
+            if step_data["email"]:
+                submission_data["email"] = step_data["email"]
+            submission_data["answers"].extend(step_data["answers"])
             
             btns = await page.locator('div[role="button"]').all()
             next_btn = None
@@ -128,6 +135,9 @@ async def submit_form(context, i, count, name_pool, url):
                 await page.wait_for_timeout(1000)
             else:
                 break
+
+        if submission_data["name"] is None:
+            submission_data["reason"] = "no text field found on form"
 
         content = await page.content()
         if "recorded" in content.lower() or "tugon" in content.lower():

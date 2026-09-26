@@ -107,10 +107,14 @@ async def run_bot(count, url, on_log, on_progress, on_done):
                 on_log(f"[{i}/{count}] Opening form...")
                 res, data = await submit_form(context, i, count, name_pool, url)
                 
-                details = f" ({data['name'] or 'Anon'}{' | ' + data['email'] if data['email'] else ''})"
+                name = data['name'] or (data.get('reason') or 'no name assigned')
+                details = f" ({name}{' | ' + data['email'] if data['email'] else ''})"
+                answers = data.get('answers') or []
                 if res:
                     success += 1
                     on_log(f"✅  [{i}/{count}] Submitted: {details}")
+                    for q, a in answers:
+                        on_log(f"      {q} → {a}")
                     on_progress(i, count, success, True)
                 else:
                     on_log(f"❌  [{i}/{count}] Failed: {details}")
