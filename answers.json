@@ -1,0 +1,10 @@
+{
+  "mode": "default",
+  "weights": [],
+  "overrides": {
+    "0": [
+      0.0,
+      100.0
+    ]
+  }
+}
