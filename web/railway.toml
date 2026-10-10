@@ -1,6 +1,6 @@
 [build]
 builder = "dockerfile"
-dockerfilePath = "apps/worker/Dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "node apps/worker/src/main.ts"
