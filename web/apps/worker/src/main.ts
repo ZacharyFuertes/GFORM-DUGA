@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { createServer } from "node:http";
 import { executeRun } from "./runner.ts";
 import type { RunRow } from "./runner.ts";
 
@@ -26,6 +27,17 @@ async function sleep(ms: number): Promise<void> {
 
 async function main(): Promise<void> {
   const supabase = makeSupabase();
+
+  // Free hosting tiers (Render, Koyeb) spin services down after idle time.
+  // Expose a health endpoint so a pinger / platform health check counts as
+  // inbound traffic and keeps the poller awake. Harmless elsewhere.
+  const port = Number(process.env.PORT ?? "8080");
+  createServer((_req, res) => {
+    res.writeHead(200, { "content-type": "text/plain" });
+    res.end("gform-duga worker ok");
+  }).listen(port, () => {
+    console.log(`health endpoint listening on :${port}`);
+  });
 
   let running = false;
   let currentRunId: number | null = null;
