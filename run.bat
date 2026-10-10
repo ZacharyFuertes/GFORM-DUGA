@@ -1,85 +1,60 @@
 @echo off
-REM Google Form Bot - Windows batch commands
+REM GFORM DUGA - Windows batch commands
+setlocal
 
-if "%1"=="install" (
-    echo Installing dependencies...
-    py -m pip install -r requirements.txt
-    echo Done!
+if "%~1"=="install" goto install
+if "%~1"=="gui"     goto gui
+if "%~1"=="bot"     goto bot
+if "%~1"=="help"    goto help
+if "%~1"==""        goto help
+
+echo Unknown command: %~1
+goto help
+
+:install
+echo Installing dependencies...
+py -m pip install -r requirements.txt
+goto end
+
+:gui
+echo Launching GFORM DUGA GUI...
+py gui_launcher.py
+goto end
+
+:bot
+if "%~2"=="" (
+    echo Usage: run.bat bot ^<form-url^> [count] [config.json]
+    echo Example: run.bat bot "https://docs.google.com/forms/d/e/XXX/viewform" 10
     goto end
 )
-
-if "%1"=="setup" (
-    echo Running configuration setup...
-    py setup_config.py
-    goto end
+set "COUNT=%~3"
+if "%COUNT%"=="" set "COUNT=1"
+set "CFG=%~4"
+echo Running %COUNT% submission^(s^)...
+if "%CFG%"=="" (
+    py gform_bot_playwright.py --url "%~2" --count %COUNT%
+) else (
+    py gform_bot_playwright.py --url "%~2" --count %COUNT% --config "%CFG%"
 )
-
-if "%1"=="test" (
-    echo Running single submission test...
-    py gform_bot.py --count 1
-    goto end
-)
-
-if "%1"=="run" (
-    if "%2"=="" (
-        echo Usage: run.bat run [count]
-        echo Example: run.bat run 100
-        goto end
-    )
-    echo Running %2 submissions...
-    py gform_bot.py --count %2
-    goto end
-)
-
-if "%1"=="report" (
-    echo Generating report...
-    py log_analyzer.py report
-    goto end
-)
-
-if "%1"=="gui" (
-    echo Launching GFORM DUGA GUI...
-    py gui_launcher.py
-    goto end
-)
-
-if "%1"=="log" (
-    echo Showing last 20 log lines...
-    py log_analyzer.py tail 20
-    goto end
-)
-
-if "%1"=="help" (
-    goto help
-)
-
-if "%1"=="" (
-    goto help
-)
-
-echo Unknown command: %1
+goto end
 
 :help
 echo.
-echo Google Form Bot - Command Help
-echo ==============================
+echo GFORM DUGA - Command Help
+echo ========================
 echo.
 echo Commands:
-echo   install     Install Python dependencies
-echo   setup       Interactive configuration setup
-echo   test        Run single submission test
-echo   gui         Launch the browser-based GUI
-echo   run [N]     Run N submissions
-echo   report      Show submission report
-echo   log         Show last 20 log lines
-echo   help        Show this help message
+echo   install                Install Python dependencies
+echo   gui                    Launch the Tkinter GUI
+echo   bot ^<url^> [count] [cfg]  Run N submissions from the CLI
+echo   help                   Show this help
 echo.
 echo Examples:
 echo   run.bat install
-echo   run.bat setup
-echo   run.bat test
-echo   run.bat run 100
-echo   run.bat report
+echo   run.bat gui
+echo   run.bat bot "https://docs.google.com/forms/d/e/XXX/viewform" 10
 echo.
+goto end
 
 :end
+endlocal

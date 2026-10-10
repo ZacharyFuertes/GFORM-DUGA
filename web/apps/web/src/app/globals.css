@@ -1,0 +1,226 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0614;
+  --surface: #190a28;
+  --input: #241140;
+  --neon: #b84dff;
+  --soft: #c77dff;
+  --lavender: #e6daff;
+  --muted: #9c8fc4;
+  --cyan: #8fe9ff;
+  --magenta: #ff7ab6;
+  --line: rgba(184, 77, 255, 0.22);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-input: var(--input);
+  --color-neon: var(--neon);
+  --color-soft: var(--soft);
+  --color-lavender: var(--lavender);
+  --color-muted: var(--muted);
+  --color-cyan: var(--cyan);
+  --color-magenta: var(--magenta);
+  --color-line: var(--line);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--lavender);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(900px 520px at 12% -8%, rgba(184, 77, 255, 0.26), transparent 62%),
+    radial-gradient(760px 460px at 96% 4%, rgba(143, 233, 255, 0.14), transparent 60%),
+    radial-gradient(1100px 700px at 50% 118%, rgba(255, 122, 182, 0.16), transparent 64%);
+}
+
+::selection {
+  background: rgba(184, 77, 255, 0.45);
+  color: #fff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(184, 77, 255, 0.55) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(184, 77, 255, 0.5);
+  border-radius: 99px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glass {
+  background: linear-gradient(180deg, rgba(36, 17, 64, 0.74), rgba(25, 10, 40, 0.5));
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid var(--line);
+  box-shadow:
+    0 22px 46px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(230, 218, 255, 0.09);
+}
+
+.glass-soft {
+  background: rgba(25, 10, 40, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(184, 77, 255, 0.16);
+}
+
+.hairline {
+  border-color: var(--line);
+}
+
+.btn-neon {
+  background: linear-gradient(135deg, #b84dff, #7a2fe0);
+  color: #fff;
+  border: 1px solid rgba(230, 218, 255, 0.35);
+  box-shadow: 0 8px 24px rgba(184, 77, 255, 0.42);
+  transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+}
+
+.btn-neon:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 12px 30px rgba(184, 77, 255, 0.6);
+}
+
+.btn-neon:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-neon:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: rgba(36, 17, 64, 0.6);
+  border: 1px solid var(--line);
+  color: var(--lavender);
+  transition: border-color 0.14s ease, background 0.14s ease;
+}
+
+.btn-ghost:hover {
+  border-color: rgba(184, 77, 255, 0.6);
+  background: rgba(52, 24, 86, 0.7);
+}
+
+.btn-ghost[data-active="true"] {
+  border-color: var(--neon);
+  background: rgba(184, 77, 255, 0.24);
+  box-shadow: 0 0 14px rgba(184, 77, 255, 0.35) inset;
+}
+
+.input-glass {
+  background: rgba(36, 17, 64, 0.85);
+  border: 1px solid rgba(184, 77, 255, 0.3);
+  color: var(--lavender);
+  outline: none;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.input-glass::placeholder {
+  color: rgba(156, 143, 196, 0.75);
+}
+
+.input-glass:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 0 3px rgba(184, 77, 255, 0.22);
+}
+
+.label-mono {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+@keyframes pill-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+
+@keyframes flash-row {
+  0% {
+    background-color: rgba(184, 77, 255, 0.42);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes scan-down {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  88% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-pulse {
+  animation: pill-pulse 1.4s ease-in-out infinite;
+}
+
+.anim-flash {
+  animation: flash-row 0.7s ease-out;
+}
+
+.anim-scan {
+  animation: scan-down 3.2s linear infinite;
+}
+
+.anim-up {
+  animation: fade-up 0.28s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-pulse,
+  .anim-scan,
+  .anim-flash,
+  .anim-up {
+    animation: none;
+  }
+}

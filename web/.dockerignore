@@ -1,0 +1,22 @@
+# Docker build context for the worker image (context root = web/)
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Env / secrets (never baked into an image)
+.env
+.env*.local
+
+# Git
+.git/
+.gitignore
+**/.gitignore
+
+# Supabase SQL + app source are not needed by the worker
+supabase/
+apps/web/
+packages/core/test/
+*.log

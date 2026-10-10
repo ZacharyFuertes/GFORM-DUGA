@@ -1,0 +1,8 @@
+**/node_modules
+**/.next
+**/dist
+**/.git
+**/.out
+**/*.log
+apps/web
+packages/core/test/fixtures/*.html

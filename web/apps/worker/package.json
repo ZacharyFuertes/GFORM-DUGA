@@ -1,0 +1,23 @@
+{
+  "name": "@gform/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=23.6.0"
+  },
+  "scripts": {
+    "start": "node src/main.ts",
+    "dry-run": "node src/dry-run.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gform/core": "*",
+    "@supabase/supabase-js": "^2.49.0",
+    "playwright-core": "1.64.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}

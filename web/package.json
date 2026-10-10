@@ -1,0 +1,16 @@
+{
+  "name": "gform-duga-web",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @gform/web",
+    "build": "npm run build --workspace @gform/web",
+    "lint": "npm run lint --workspace @gform/web",
+    "test": "npm test --workspace @gform/core",
+    "typecheck": "npm run typecheck --workspaces"
+  }
+}
