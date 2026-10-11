@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@gform/core"],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

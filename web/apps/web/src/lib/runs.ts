@@ -1,6 +1,6 @@
 "use client";
 
-import type { AnswerConfigData, FormSchema } from "@gform/core";
+import type { AnswerConfigData, FormSchema } from "@/lib/core";
 import { ensureSession, getSupabase } from "./supabase";
 
 export type RunStatus = "queued" | "running" | "done" | "failed" | "cancelled";

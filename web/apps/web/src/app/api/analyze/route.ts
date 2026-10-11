@@ -1,4 +1,4 @@
-import { analyze, isAnalyzeError } from "@gform/core";
+import { analyze, isAnalyzeError } from "@/lib/core";
 
 const URL_RE = /^https?:\/\/\S+$/i;
 

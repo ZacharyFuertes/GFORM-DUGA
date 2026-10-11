@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { AnswerConfigData, ConfigMode } from "@gform/core";
-import { MODES } from "@gform/core";
+import type { AnswerConfigData, ConfigMode } from "@/lib/core";
+import { MODES } from "@/lib/core";
 
 interface Props {
   config: AnswerConfigData;

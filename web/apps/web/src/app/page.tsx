@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnswerConfig, makePicker } from "@gform/core";
-import type { AnswerConfigData, FormSchema } from "@gform/core";
+import { AnswerConfig, makePicker } from "@/lib/core";
+import type { AnswerConfigData, FormSchema } from "@/lib/core";
 import AmbientBackdrop from "@/components/AmbientBackdrop";
 import ConfigPanel from "@/components/ConfigPanel";
 import FormView from "@/components/FormView";

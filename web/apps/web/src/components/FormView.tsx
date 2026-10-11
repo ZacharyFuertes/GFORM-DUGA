@@ -1,6 +1,6 @@
 "use client";
 
-import type { FormSchema } from "@gform/core";
+import type { FormSchema } from "@/lib/core";
 
 interface Props {
   schema: FormSchema;
